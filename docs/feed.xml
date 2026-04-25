@@ -1,19 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
   <channel>
-    <title>00981A 每日持股觀察</title>
+    <title>00981A小愛幫你追追追</title>
     <link>https://lovemg755-cmyk.github.io/00981a-podcast/feed.xml</link>
-    <description>每個交易日追蹤統一台股增長主動式 ETF (00981A) 的持股變化，剖析背後的投資策略與個股催化劑。</description>
+    <description>AI 主播小愛每個交易日帶你追蹤 00981A 統一台股增長主動式 ETF 的持股、收盤、與催化劑。5–10 分鐘掌握主動 ETF 經理人在做什麼，盤後輕鬆吸收最新動態。</description>
     <atom:link href="https://lovemg755-cmyk.github.io/00981a-podcast/feed.xml" rel="self"/>
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <image>
       <url>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/cover.png</url>
-      <title>00981A 每日持股觀察</title>
+      <title>00981A小愛幫你追追追</title>
       <link>https://lovemg755-cmyk.github.io/00981a-podcast/feed.xml</link>
     </image>
     <language>zh-TW</language>
-    <lastBuildDate>Sat, 25 Apr 2026 10:48:17 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 25 Apr 2026 11:07:14 +0000</lastBuildDate>
     <itunes:author>AI 主播小愛</itunes:author>
     <itunes:category text="Business">
       <itunes:category text="Investing"/>
@@ -24,7 +24,7 @@
       <itunes:name>AI 主播小愛</itunes:name>
       <itunes:email>lovemg755@gmail.com</itunes:email>
     </itunes:owner>
-    <itunes:summary>每個交易日追蹤統一台股增長主動式 ETF (00981A) 的持股變化，剖析背後的投資策略與個股催化劑。</itunes:summary>
+    <itunes:summary>AI 主播小愛每個交易日帶你追蹤 00981A 統一台股增長主動式 ETF 的持股、收盤、與催化劑。5–10 分鐘掌握主動 ETF 經理人在做什麼，盤後輕鬆吸收最新動態。</itunes:summary>
     <itunes:type>episodic</itunes:type>
     <item>
       <title>4/24 00981A：單日大漲四點四趴，AI 供應鏈全面開花</title>
