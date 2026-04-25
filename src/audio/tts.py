@@ -13,15 +13,31 @@ from ..utils.config import Settings
 from ..utils.logger import logger
 
 # 段落間靜音（毫秒）
-SILENCE_BETWEEN_SEGMENTS_MS = 600
+SILENCE_BETWEEN_SEGMENTS_MS = 800
+# 段落拼接時的 cross-fade（毫秒），消除接縫突兀感
+SEGMENT_CROSSFADE_MS = 30
 # 句子間額外停頓（用 SSML break 模擬）
 _SENTENCE_END = re.compile(r"([。！？\n])")
 
 
 def _add_breathing_pauses(text: str) -> str:
-    """在句尾加上短停頓，讓朗讀更自然。Edge TTS 接受 SSML，但純文字模式
-    透過標點密度即可。這裡保留純文字，僅整理多餘空白。"""
+    """準備餵給 Edge TTS 的純文字。
+
+    1. 移除所有 Markdown 格式符號（** _ ~ ` 等），避免 TTS 念出「星號星號」
+    2. 也移除單一 *（用於股票名稱如「巨*」），避免「巨星號」念法
+    3. 把破折號 — 換成逗號，讓停頓更自然
+    4. 整理空白
+    """
     text = text.replace("\r", "").strip()
+    # Markdown 符號 → 完全移除
+    text = re.sub(r"\*+", "", text)   # 移除 ** 與 *（含股票名稱中的星號）
+    text = re.sub(r"_{2,}", "", text)  # 移除 __ 多重底線（保留中文底線變體）
+    text = re.sub(r"~+", "", text)    # 移除 ~~ 與 ~
+    text = re.sub(r"`+", "", text)    # 移除 ` 與 ```
+    # 破折號 → 逗號（自然停頓）
+    text = text.replace("——", "，")
+    text = text.replace("—", "，")
+    # 多餘空白
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text
@@ -74,15 +90,31 @@ async def synthesize(
     return narration
 
 
+def _trim_silence(seg, threshold_db: int = -45):
+    """裁掉每段首尾的死寂（保留 30ms 自然氣口）。"""
+    from pydub.silence import detect_leading_silence
+    lead = detect_leading_silence(seg, silence_threshold=threshold_db)
+    tail = detect_leading_silence(seg.reverse(), silence_threshold=threshold_db)
+    lead = max(0, lead - 30)  # 留 30ms 自然氣口
+    tail = max(0, tail - 30)
+    return seg[lead : len(seg) - tail]
+
+
 def _concat_mp3s(parts: list[Path], output: Path) -> None:
-    """用 pydub 串接多個 mp3，段間插入靜音。"""
+    """串接多段 mp3：每段先裁掉首尾死寂，段間 800ms 靜音 + 30ms cross-fade。"""
     from pydub import AudioSegment  # 延遲匯入
 
     silence = AudioSegment.silent(duration=SILENCE_BETWEEN_SEGMENTS_MS)
     combined: AudioSegment | None = None
     for p in parts:
         seg = AudioSegment.from_mp3(p)
-        combined = seg if combined is None else combined + silence + seg
+        seg = _trim_silence(seg)
+        if combined is None:
+            combined = seg
+        else:
+            # 用 append + crossfade 讓接縫平順
+            combined = combined.append(silence, crossfade=0)
+            combined = combined.append(seg, crossfade=SEGMENT_CROSSFADE_MS)
     assert combined is not None
     combined.export(output, format="mp3", bitrate="128k")
 
