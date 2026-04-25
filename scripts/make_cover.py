@@ -209,7 +209,7 @@ def add_text(img: Image.Image) -> Image.Image:
     img = Image.alpha_composite(img, line)
 
     foot_font = find_font(46)
-    foot = "AI 主播小愛 · 每交易日 17:30"
+    foot = "AI 主播小愛陪伴你投資每一天"
     img = draw_text_with_glow(
         img, foot, foot_font,
         (centered_x(foot, foot_font), 1240),
