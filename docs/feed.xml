@@ -13,7 +13,7 @@
       <link>https://lovemg755-cmyk.github.io/00981a-podcast/feed.xml</link>
     </image>
     <language>zh-TW</language>
-    <lastBuildDate>Sat, 25 Apr 2026 11:07:14 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 25 Apr 2026 12:33:47 +0000</lastBuildDate>
     <itunes:author>AI 主播小愛</itunes:author>
     <itunes:category text="Business">
       <itunes:category text="Investing"/>
@@ -26,25 +26,5 @@
     </itunes:owner>
     <itunes:summary>AI 主播小愛每個交易日帶你追蹤 00981A 統一台股增長主動式 ETF 的持股、收盤、與催化劑。5–10 分鐘掌握主動 ETF 經理人在做什麼，盤後輕鬆吸收最新動態。</itunes:summary>
     <itunes:type>episodic</itunes:type>
-    <item>
-      <title>4/24 00981A：單日大漲四點四趴，AI 供應鏈全面開花</title>
-      <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3</link>
-      <description>00981A 今日收漲四點四趴，收盤二七點八元。持股集中 AI 載板、散熱、電源，台積電、台光電、健策領軍。催化劑聚焦 AI 伺服器供應鏈需求持續放量。</description>
-      <guid isPermaLink="false">https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3</guid>
-      <enclosure url="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3" length="6723652" type="audio/mpeg"/>
-      <pubDate>Fri, 24 Apr 2026 18:00:00 +0800</pubDate>
-      <itunes:duration>00:06:36</itunes:duration>
-      <itunes:explicit>no</itunes:explicit>
-    </item>
-    <item>
-      <title>4/23 00981A：收小跌 1.2%，盤中震盪幅度不小</title>
-      <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-23.mp3</link>
-      <description>00981A 今日收 26.62 元，跌了一點二趴，盤中從 28 元附近一路殺到 26 元低點，震盪幅度將近八趴。持股集中 AI 供應鏈，台積電、台光電、健策前三重。</description>
-      <guid isPermaLink="false">https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-23.mp3</guid>
-      <enclosure url="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-23.mp3" length="7332890" type="audio/mpeg"/>
-      <pubDate>Thu, 23 Apr 2026 18:00:00 +0800</pubDate>
-      <itunes:duration>00:07:14</itunes:duration>
-      <itunes:explicit>no</itunes:explicit>
-    </item>
   </channel>
 </rss>
