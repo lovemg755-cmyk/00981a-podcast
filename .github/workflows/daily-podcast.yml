@@ -1,0 +1,86 @@
+name: Daily 00981A Podcast
+
+on:
+  schedule:
+    # 台北 17:30 = UTC 09:30，週一至週五（隔天 0:30 後台股已收盤、持股已公告）
+    - cron: "30 9 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "強制指定日期 YYYY-MM-DD（預設今天）"
+        required: false
+      dry_run:
+        description: "Dry run（不上傳、不更新 RSS）"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: daily-podcast
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install ffmpeg + ffmpeg-normalize prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          PODCAST_TITLE: ${{ vars.PODCAST_TITLE }}
+          PODCAST_AUTHOR: ${{ vars.PODCAST_AUTHOR }}
+          PODCAST_EMAIL: ${{ vars.PODCAST_EMAIL }}
+          PODCAST_DESCRIPTION: ${{ vars.PODCAST_DESCRIPTION }}
+          PODCAST_HOMEPAGE: ${{ vars.PODCAST_HOMEPAGE }}
+          PODCAST_COVER_URL: ${{ vars.PODCAST_COVER_URL }}
+          PODCAST_CATEGORY: ${{ vars.PODCAST_CATEGORY }}
+          PODCAST_SUBCATEGORY: ${{ vars.PODCAST_SUBCATEGORY }}
+          TTS_VOICE: ${{ vars.TTS_VOICE }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            ARGS="$ARGS --date ${{ github.event.inputs.date }}"
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python -m src.main $ARGS
+
+      - name: Commit data + RSS
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "podcast-bot"
+          git config user.email "podcast-bot@users.noreply.github.com"
+          git add data/ docs/feed.xml docs/index.html
+          if git diff --cached --quiet; then
+            echo "無變動，略過 commit"
+          else
+            git commit -m "Episode $(date -u +%F): auto-publish"
+            git push
+          fi

@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# 環境檔
+.env
+.env.local
+
+# 建置產出
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 暫存音訊
+*.tmp.mp3
+
+# Claude Code 本機設定（含工作流程記憶）
+.claude/

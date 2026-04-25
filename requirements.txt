@@ -1,0 +1,39 @@
+# 採用 >= 寫法相容 Python 3.12–3.14（GitHub Actions 用 3.12）
+
+# === HTTP / 網頁擷取 ===
+httpx>=0.27.2
+selectolax>=0.3.32
+tenacity>=9.0.0
+
+# === LLM ===
+anthropic>=0.40.0
+
+# === TTS ===
+edge-tts>=6.1.19
+
+# === 音訊處理 ===
+pydub>=0.25.1
+audioop-lts>=0.2.1; python_version >= "3.13"
+static-ffmpeg>=2.5  # Windows 免裝系統 ffmpeg；Linux runner 仍會用 apt 裝的
+ffmpeg-normalize>=1.28.3
+mutagen>=1.47.0
+
+# === RSS / Podcast ===
+feedgen>=1.0.0
+feedparser>=6.0.11
+
+# === Cloudflare R2 (S3 相容) ===
+boto3>=1.35.71
+
+# === 工具 ===
+python-dotenv>=1.0.1
+twstock>=1.3.1
+pillow>=11.3.0
+pydantic>=2.11.0
+loguru>=0.7.3
+truststore>=0.10.0
+
+# === 測試 ===
+pytest>=8.3.4
+pytest-asyncio>=0.25.0
+respx>=0.22.0

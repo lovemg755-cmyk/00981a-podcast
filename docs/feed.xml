@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+  <channel>
+    <title>00981A 每日持股觀察</title>
+    <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/feed.xml</link>
+    <description>每個交易日追蹤統一台股增長主動式 ETF (00981A) 的持股變化，剖析背後的投資策略與個股催化劑。</description>
+    <atom:link href="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/feed.xml" rel="self"/>
+    <docs>http://www.rssboard.org/rss-specification</docs>
+    <generator>python-feedgen</generator>
+    <image>
+      <url>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/cover.png</url>
+      <title>00981A 每日持股觀察</title>
+      <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/feed.xml</link>
+    </image>
+    <language>zh-TW</language>
+    <lastBuildDate>Sat, 25 Apr 2026 10:19:15 +0000</lastBuildDate>
+    <itunes:author>AI 主播</itunes:author>
+    <itunes:category text="Business">
+      <itunes:category text="Investing"/>
+    </itunes:category>
+    <itunes:image href="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/cover.png"/>
+    <itunes:explicit>no</itunes:explicit>
+    <itunes:owner>
+      <itunes:name>AI 主播</itunes:name>
+      <itunes:email>lovemg755@gmail.com</itunes:email>
+    </itunes:owner>
+    <itunes:summary>每個交易日追蹤統一台股增長主動式 ETF (00981A) 的持股變化，剖析背後的投資策略與個股催化劑。</itunes:summary>
+    <itunes:type>episodic</itunes:type>
+    <item>
+      <title>4/24 00981A：單日大漲四點四趴，AI 供應鏈全面開花</title>
+      <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3</link>
+      <description>00981A 今日收漲四點四趴，收盤二七點八元。持股集中 AI 載板、散熱、電源，台積電、台光電、健策領軍。催化劑聚焦 AI 伺服器供應鏈需求持續放量。</description>
+      <guid isPermaLink="false">https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3</guid>
+      <enclosure url="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3" length="6723652" type="audio/mpeg"/>
+      <pubDate>Fri, 24 Apr 2026 18:00:00 +0800</pubDate>
+      <itunes:duration>00:06:36</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>4/23 00981A：收小跌 1.2%，盤中震盪幅度不小</title>
+      <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-23.mp3</link>
+      <description>00981A 今日收 26.62 元，跌了一點二趴，盤中從 28 元附近一路殺到 26 元低點，震盪幅度將近八趴。持股集中 AI 供應鏈，台積電、台光電、健策前三重。</description>
+      <guid isPermaLink="false">https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-23.mp3</guid>
+      <enclosure url="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-23.mp3" length="7332890" type="audio/mpeg"/>
+      <pubDate>Thu, 23 Apr 2026 18:00:00 +0800</pubDate>
+      <itunes:duration>00:07:14</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+  </channel>
+</rss>
