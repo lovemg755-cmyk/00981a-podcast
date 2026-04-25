@@ -36,9 +36,9 @@ class PodcastScript(BaseModel):
 def _format_brief_for_llm(brief: DailyBrief) -> str:
     """把 DailyBrief 轉成給 LLM 的緊湊文字描述。"""
     lines = [
-        f"日期：{brief.date.isoformat()}",
+        f"分析交易日：{brief.date.isoformat()}（節目發布為其後第一個工作日早上 7:00）",
         f"基金：00981A 統一台股增長主動式 ETF",
-        f"今日持股檔數：{len(brief.snapshot_today.holdings)}",
+        f"當日持股檔數：{len(brief.snapshot_today.holdings)}",
     ]
     if brief.quote:
         q = brief.quote
@@ -55,25 +55,53 @@ def _format_brief_for_llm(brief: DailyBrief) -> str:
             f"- 前一交易日收盤：{q.prev_close:.2f} 元",
             f"- 成交量：{q.volume / 1000:,.0f} 千股",
         ])
+    if brief.benchmark:
+        bm = brief.benchmark
+        lines.extend([
+            "",
+            f"## 主動偏離分析（{bm.target_etf} vs {bm.benchmark_etf}）",
+            f"- {bm.target_etf} 前 10 大集中度：{bm.target_top10_concentration:.1f}%",
+            f"- {bm.benchmark_etf} 前 10 大集中度：{bm.benchmark_top10_concentration:.1f}%",
+            "",
+            "### 主動偏離 top 8（依 |權重差| 排序）",
+        ])
+        kind_label = {
+            "overweight": "Overweight 加碼",
+            "underweight": "Underweight 減碼",
+            "alpha_only": "Alpha 來源（0050 沒有）",
+            "missing": "主動避開（0050 有但 00981A 沒有）",
+        }
+        for d in bm.deviations:
+            sign = "+" if d.delta >= 0 else ""
+            lines.append(
+                f"- [{kind_label[d.kind]}] {d.name}({d.ticker})："
+                f"00981A {d.weight_target:.2f}% vs 0050 {d.weight_benchmark:.2f}%  "
+                f"(Δ{sign}{d.delta:.2f} pp)"
+            )
+
+    src = brief.snapshot_today.source
+    is_full = src == "cmoney"
     lines.extend([
         "",
-        "## 持股變化（已過濾出 top 重要事件）",
+        f"## 持股變化事件（資料來源：{src}，{'完整持股清單' if is_full else '僅前 10 大'}）",
     ])
     if not brief.changes:
-        lines.append("（今日無顯著持股變化）")
+        lines.append("（今日無顯著持股變化事件）")
     for ev in brief.changes:
         if ev.kind == "new":
+            label = "新建倉" if is_full else "進入前 10 大（可能新買或排名上升）"
             lines.append(
-                f"- 新進 {ev.name}({ev.ticker})，權重 {ev.weight_today:.2f}%"
+                f"- 【{label}】{ev.name}({ev.ticker})，今日權重 {ev.weight_today:.2f}%"
             )
         elif ev.kind == "exit":
+            label = "出清" if is_full else "跌出前 10 大（可能減碼或排名下降）"
             lines.append(
-                f"- 出清 {ev.name}({ev.ticker})，原權重 {ev.weight_yesterday:.2f}%"
+                f"- 【{label}】{ev.name}({ev.ticker})，昨日權重 {ev.weight_yesterday:.2f}%"
             )
         else:
-            arrow = "↑" if ev.kind == "increase" else "↓"
+            label = "加碼" if ev.kind == "increase" else "減碼"
             lines.append(
-                f"- {arrow} {ev.name}({ev.ticker}) 權重 "
+                f"- 【{label}】{ev.name}({ev.ticker}) "
                 f"{ev.weight_yesterday:.2f}% → {ev.weight_today:.2f}% "
                 f"(Δ{ev.weight_delta:+.2f}pp)"
             )

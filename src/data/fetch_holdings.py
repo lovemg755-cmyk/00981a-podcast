@@ -50,13 +50,15 @@ def _today() -> date:
 # ---------- 主要來源：MoneyDJ ----------
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=8))
-async def fetch_from_moneydj(client: httpx.AsyncClient) -> HoldingsSnapshot:
-    """MoneyDJ ETF 持股頁。
+async def fetch_etf_from_moneydj(
+    client: httpx.AsyncClient, etf_id: str
+) -> HoldingsSnapshot:
+    """通用 MoneyDJ ETF 持股抓取（00981A 與對標基準如 0050 共用）。
 
-    結構：tables[i] 含 header ['個股名稱','持股比率(%)','持股股數']，row 為
+    結構：tables[i] 含 header ['個股名稱','投資比例(%)','持有股數']，row 為
     ['台積電(2330.TW)', '9.39', '9,114,000.00']。
     """
-    url = "https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid=00981a.tw"
+    url = f"https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid={etf_id.lower()}.tw"
     resp = await client.get(url, headers=HEADERS, timeout=20.0)
     resp.raise_for_status()
     tree = HTMLParser(resp.text)
@@ -66,15 +68,12 @@ async def fetch_from_moneydj(client: httpx.AsyncClient) -> HoldingsSnapshot:
         rows = t.css("tr")
         if len(rows) < 3:
             continue
-        # 看 header 是否含「個股名稱」+「投資比例」/「比例」
-        # MoneyDJ 實際 header：個股名稱 | 投資比例(%) | 持有股數
         head_cells = [c.text(strip=True) for c in rows[0].css("td, th")]
         head_text = "".join(head_cells)
         if "個股名稱" not in head_text:
             continue
         if not any(kw in head_text for kw in ("投資比例", "比例", "持股", "持有股")):
             continue
-        # 解析 data rows
         for r in rows[1:]:
             cells = [c.text(strip=True) for c in r.css("td, th")]
             if len(cells) < 3:
@@ -82,50 +81,60 @@ async def fetch_from_moneydj(client: httpx.AsyncClient) -> HoldingsSnapshot:
             m = _NAME_TICKER_RE.match(cells[0])
             if not m:
                 continue
-            name = m.group(1).strip()
-            ticker = m.group(2)
             weight = _to_float(cells[1])
-            shares = _to_int(cells[2])
             if weight is None or weight <= 0:
                 continue
-            holdings.append(Holding(ticker=ticker, name=name, weight=weight, shares=shares))
+            holdings.append(Holding(
+                ticker=m.group(2),
+                name=m.group(1).strip(),
+                weight=weight,
+                shares=_to_int(cells[2]),
+            ))
         break
 
     if not holdings:
-        raise ValueError("MoneyDJ 找不到持股表，可能改版")
+        raise ValueError(f"MoneyDJ 找不到 {etf_id} 持股表，可能改版")
 
     return HoldingsSnapshot(
         date=_today(),
-        fund_code="00981A",
+        fund_code=etf_id.upper(),
         holdings=holdings,
         source="moneydj",
     )
 
 
+async def fetch_from_moneydj(client: httpx.AsyncClient) -> HoldingsSnapshot:
+    """抓 00981A 持股（向後相容包裝）。"""
+    return await fetch_etf_from_moneydj(client, "00981a")
+
+
 # ---------- 主入口 ----------
 
 async def fetch_holdings() -> HoldingsSnapshot:
-    """目前僅用 MoneyDJ（前 10 大持股）。
+    """主要來源：CMoney 完整持股（透過 Playwright 渲染 SPA）。
+    備援：MoneyDJ 前 10 大持股（純 HTTP 抓取，但只有 top 10）。
 
-    Yahoo / cmoney / pocket 為 SPA 動態載入，pure HTML 抓不到正確資料；
-    若想取得全持股名單，未來可逆向 cmoney/pocket 的 client-side API。
+    主要來源失敗時退回備援，確保流程可繼續，但 changes 比對時要注意 source 一致性。
     """
-    sources = [
-        ("moneydj", fetch_from_moneydj),
-    ]
-    last_exc: Exception | None = None
+    # 1. 主要來源：CMoney 完整持股
+    try:
+        from .fetch_full_holdings import fetch_full_holdings_cmoney
+        logger.info("嘗試從 cmoney（Playwright 渲染）抓 00981A 完整持股…")
+        snap = await fetch_full_holdings_cmoney("00981A")
+        logger.success(f"cmoney 成功，共 {len(snap.holdings)} 檔持股")
+        return snap
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(f"cmoney 失敗，退回 MoneyDJ top10：{exc}")
+
+    # 2. 備援：MoneyDJ 前 10 大
     async with httpx.AsyncClient(follow_redirects=True) as client:
-        for name, fn in sources:
-            try:
-                logger.info(f"嘗試從 {name} 抓取 00981A 持股…")
-                snap = await fn(client)
-                logger.success(f"{name} 成功，共 {len(snap.holdings)} 檔持股")
-                return snap
-            except Exception as exc:  # noqa: BLE001
-                logger.warning(f"{name} 失敗: {exc}")
-                last_exc = exc
-                continue
-    raise RuntimeError(f"所有來源皆失敗，最後錯誤: {last_exc}")
+        try:
+            logger.info("嘗試從 moneydj 抓 00981A 持股（前 10 大）…")
+            snap = await fetch_from_moneydj(client)
+            logger.success(f"moneydj 成功（備援），共 {len(snap.holdings)} 檔持股")
+            return snap
+        except Exception as exc:  # noqa: BLE001
+            raise RuntimeError(f"所有來源皆失敗，最後錯誤: {exc}") from exc
 
 
 def save_snapshot(snap: HoldingsSnapshot) -> Path:

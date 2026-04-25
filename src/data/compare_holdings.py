@@ -19,6 +19,14 @@ def compare(
     """
     if yesterday is None:
         return []
+    # source 不一致時禁止比對（例如 cmoney 48 檔 vs moneydj 10 檔會誤判一堆假變化）
+    if today.source != yesterday.source:
+        from ..utils.logger import logger
+        logger.warning(
+            f"資料來源不一致（today={today.source} vs yesterday={yesterday.source}），"
+            f"跳過 changes 比對以避免假變化"
+        )
+        return []
 
     today_map = today.by_ticker()
     yest_map = yesterday.by_ticker()

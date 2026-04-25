@@ -76,6 +76,34 @@ class DailyQuote(BaseModel):
     prev_close: float
 
 
+DeviationKind = Literal["overweight", "underweight", "alpha_only", "missing"]
+
+
+class ActiveDeviation(BaseModel):
+    """單檔股票相對 benchmark 的權重偏離。
+
+    - overweight：兩家都持有，但 00981A 配置高於 0050
+    - underweight：兩家都持有，但 00981A 配置低於 0050
+    - alpha_only：只有 00981A 持有，0050 沒有 → 純 alpha 來源
+    - missing：只有 0050 持有，00981A 沒有 → 主動避開
+    """
+
+    ticker: str
+    name: str
+    weight_target: float       # 在 00981A 的權重（沒持有則 0）
+    weight_benchmark: float    # 在 0050 的權重（沒持有則 0）
+    delta: float               # weight_target - weight_benchmark（百分點差）
+    kind: DeviationKind
+
+
+class BenchmarkComparison(BaseModel):
+    target_etf: str = "00981A"
+    benchmark_etf: str = "0050"
+    deviations: list[ActiveDeviation]
+    target_top10_concentration: float    # 00981A 前 10 大合計權重
+    benchmark_top10_concentration: float  # 0050 前 10 大合計權重
+
+
 class DailyBrief(BaseModel):
     date: date
     snapshot_today: HoldingsSnapshot
@@ -83,3 +111,4 @@ class DailyBrief(BaseModel):
     changes: list[ChangeEvent]
     stock_briefs: list[StockBrief]
     quote: DailyQuote | None = None
+    benchmark: BenchmarkComparison | None = None

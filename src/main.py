@@ -22,12 +22,17 @@ from .audio.compose import compose_episode, get_duration_seconds
 from .audio.tts import synthesize
 from .data.compare_holdings import compare
 from .data.fetch_catalysts import fetch_catalysts_batch
+from .data.fetch_benchmark import compute_active_deviations, fetch_benchmark_0050
 from .data.fetch_holdings import (
     fetch_holdings,
     latest_snapshot_before,
     save_snapshot,
 )
-from .data.fetch_price import NotATradingDay, fetch_latest_quote
+from .data.fetch_price import (
+    NotATradingDay,
+    fetch_latest_quote,
+    fetch_latest_trading_quote,
+)
 from .data.models import DailyBrief, DailyQuote, StockBrief
 from .publish.update_rss import (
     EpisodeRecord,
@@ -43,23 +48,27 @@ from .utils.notify import send_discord
 
 
 async def run_pipeline(*, target_date: date | None = None, dry_run: bool = False) -> Path | None:
-    target_date = target_date or datetime.now().date()
-    logger.info(f"=== 開始產製 {target_date} 集數 (dry_run={dry_run}) ===")
-
-    # 第一道防線：週末直接跳（GitHub Actions cron 已限制週一~五，這裡為雙保險）
-    if target_date.weekday() >= 5:
-        logger.info(f"{target_date} 為週末，跳過")
-        return None
-
     settings = Settings.load(require_secrets=not dry_run)
 
-    # 第二道防線（TWSE 為真理來源）：抓股價，若該日無資料 → 非交易日（國定假日、颱風假等）
-    try:
-        raw_quote = fetch_latest_quote("00981A", target_date=target_date)
-    except NotATradingDay as exc:
-        logger.info(f"{target_date} 非交易日，跳過產製：{exc}")
-        return None
+    # 鎖定要分析的交易日：預設是「最近一個有 TWSE 交易資料的日期」
+    # 對應「早上 7:00 跑、分析前一交易日」的設計
+    if target_date is None:
+        try:
+            raw_quote = fetch_latest_trading_quote("00981A")
+        except Exception as exc:  # noqa: BLE001
+            logger.error(f"無法從 TWSE 取得最近交易日資料：{exc}")
+            return None
+        target_date = raw_quote.date
+    else:
+        # 指定日期：驗證為交易日，不是則 graceful skip
+        try:
+            raw_quote = fetch_latest_quote("00981A", target_date=target_date)
+        except NotATradingDay as exc:
+            logger.info(f"{target_date} 非交易日，跳過產製：{exc}")
+            return None
+
     quote = DailyQuote(**raw_quote.__dict__)
+    logger.info(f"=== 開始產製 {target_date} 交易日的 podcast (dry_run={dry_run}) ===")
 
     episode_dir = BUILD_DIR / "episodes" / target_date.isoformat()
     episode_dir.mkdir(parents=True, exist_ok=True)
@@ -94,6 +103,18 @@ async def run_pipeline(*, target_date: date | None = None, dry_run: bool = False
         for ev in changes
     ]
 
+    # 4. 對標 benchmark (0050) 抓取 + 主動偏離計算
+    benchmark_comparison = None
+    try:
+        snap_0050 = await fetch_benchmark_0050()
+        benchmark_comparison = compute_active_deviations(snap_today, snap_0050)
+        logger.info(
+            f"主動偏離計算完成：top10 集中度 {benchmark_comparison.target_top10_concentration:.1f}% "
+            f"vs 0050 {benchmark_comparison.benchmark_top10_concentration:.1f}%"
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(f"benchmark (0050) 抓取失敗，講稿將不含主動偏離分析：{exc}")
+
     brief = DailyBrief(
         date=target_date,
         snapshot_today=snap_today,
@@ -101,6 +122,7 @@ async def run_pipeline(*, target_date: date | None = None, dry_run: bool = False
         changes=changes,
         stock_briefs=stock_briefs,
         quote=quote,
+        benchmark=benchmark_comparison,
     )
 
     # 4. 講稿

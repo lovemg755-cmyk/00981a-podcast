@@ -93,7 +93,9 @@ def fetch_latest_quote(
     fields: list[str] = j.get("fields", [])
     rows: list[list[str]] = j.get("data", [])
     if not rows:
-        raise ValueError("TWSE 該月份無交易資料")
+        raise NotATradingDay(
+            f"TWSE {query_month.strftime('%Y/%m')} 該月份無 {fund_code} 交易資料"
+        )
 
     idx = {name: fields.index(name) for name in fields}
 
@@ -137,7 +139,35 @@ def fetch_latest_quote(
     return quote
 
 
+def fetch_latest_trading_quote(
+    fund_code: str = "00981A",
+    *,
+    end_date: date | None = None,
+    max_lookback: int = 14,
+) -> DailyQuote:
+    """從 end_date 往前推，找出最近一個有交易資料的日期。
+
+    用於「今天早上跑，分析最近交易日」的情境：
+    - 週一早上跑 → end_date=週一 → 往前推到上週五
+    - 一般週中早上跑 → end_date=今天 → 往前推到昨天
+    - 春節後第一天 → 往前推可能 5+ 天才找到
+    """
+    from datetime import timedelta
+
+    end_date = end_date or date.today()
+    last_exc: Exception | None = None
+    for offset in range(max_lookback):
+        candidate = end_date - timedelta(days=offset)
+        try:
+            return fetch_latest_quote(fund_code, target_date=candidate)
+        except NotATradingDay as exc:
+            last_exc = exc
+            continue
+    raise RuntimeError(
+        f"從 {end_date} 往前 {max_lookback} 天找不到 {fund_code} 的交易資料：{last_exc}"
+    )
+
+
 if __name__ == "__main__":
-    q = fetch_latest_quote()
-    print(q)
+    q = fetch_latest_trading_quote()
     print(q.headline)
