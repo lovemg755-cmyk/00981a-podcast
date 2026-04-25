@@ -120,6 +120,8 @@ def regenerate_feed(*, settings: Settings | None = None) -> Path:
         fe.pubDate(pub_dt)
         fe.podcast.itunes_duration(_format_duration(ep.duration_sec))
         fe.podcast.itunes_explicit("yes" if settings.podcast_explicit else "no")
+        # 每集獨立的封面圖（用節目同一張，Apple Podcasts Connect 才不會顯示「未提供」）
+        fe.podcast.itunes_image(settings.podcast_cover_url)
 
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
     fg.rss_file(str(FEED_PATH), pretty=True)
