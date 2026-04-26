@@ -29,3 +29,8 @@ Thumbs.db
 
 # Claude Code 本機設定（含工作流程記憶）
 .claude/
+
+# 私人文件（個人保留、不公開）
+PROJECT_REPORT.md
+*_PRIVATE.md
+NOTES.md
