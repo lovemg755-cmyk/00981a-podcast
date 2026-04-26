@@ -13,7 +13,7 @@
       <link>https://lovemg755-cmyk.github.io/00981a-podcast/feed.xml</link>
     </image>
     <language>zh-TW</language>
-    <lastBuildDate>Sat, 25 Apr 2026 12:40:58 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 26 Apr 2026 23:40:06 +0000</lastBuildDate>
     <itunes:author>AI 主播小愛</itunes:author>
     <itunes:category text="Business">
       <itunes:category text="Investing"/>
@@ -26,5 +26,16 @@
     </itunes:owner>
     <itunes:summary>AI 主播小愛每個交易日帶你追蹤 00981A 統一台股增長主動式 ETF 的持股、收盤、與催化劑。5–10 分鐘掌握主動 ETF 經理人在做什麼，盤後輕鬆吸收最新動態。</itunes:summary>
     <itunes:type>episodic</itunes:type>
+    <item>
+      <title>4/24 00981A：ABF 載板加散熱全開，單日漲了四趴多</title>
+      <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3</link>
+      <description>2026年4月24日 00981A 單日漲幅四點四趴，成交量將近七十萬張。瑤姊把九成資金押在 AI 供應鏈中型股，健策、金像電、南電、貿聯-KY 四檔純 alpha 合計逾兩成，這才是今天的主角。</description>
+      <guid isPermaLink="false">https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3</guid>
+      <enclosure url="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-24.mp3" length="8693304" type="audio/mpeg"/>
+      <pubDate>Fri, 24 Apr 2026 18:00:00 +0800</pubDate>
+      <itunes:image href="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/cover.png"/>
+      <itunes:duration>00:08:39</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
   </channel>
 </rss>
