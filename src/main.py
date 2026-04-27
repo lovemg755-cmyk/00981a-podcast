@@ -36,6 +36,7 @@ from .data.fetch_price import (
     fetch_latest_quote,
     fetch_latest_trading_quote,
 )
+from .data.fetch_us_market import fetch_us_market_overnight
 from .data.models import DailyBrief, DailyQuote, StockBrief
 from .publish.update_rss import (
     EpisodeRecord,
@@ -118,6 +119,13 @@ async def run_pipeline(*, target_date: date | None = None, dry_run: bool = False
     except Exception as exc:  # noqa: BLE001
         logger.warning(f"benchmark (0050) 抓取失敗，講稿將不含主動偏離分析：{exc}")
 
+    # 5. 美股昨夜（給 market 段當引子，失敗則 graceful skip）
+    us_market = None
+    try:
+        us_market = await fetch_us_market_overnight()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(f"美股昨夜抓取失敗，講稿將不含美股引子：{exc}")
+
     brief = DailyBrief(
         date=target_date,
         snapshot_today=snap_today,
@@ -126,6 +134,7 @@ async def run_pipeline(*, target_date: date | None = None, dry_run: bool = False
         stock_briefs=stock_briefs,
         quote=quote,
         benchmark=benchmark_comparison,
+        us_market=us_market,
     )
 
     # 4. 講稿

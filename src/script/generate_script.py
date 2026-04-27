@@ -111,6 +111,20 @@ def _format_brief_for_llm(brief: DailyBrief, publish_date: date) -> str:
                 f"(Δ{sign}{d.delta:.2f} pp)"
             )
 
+    if brief.us_market:
+        us = brief.us_market
+        lines.extend([
+            "",
+            f"## 美股昨夜（{us.session_date.isoformat()} 紐約收盤）",
+            "用於 market 段「大盤情境」的引子，描述美股對台股 AI 供應鏈的傳導壓力。",
+        ])
+        for q in us.quotes:
+            sign = "+" if q.change >= 0 else ""
+            lines.append(
+                f"- [{q.category}] {q.display_name}({q.symbol})："
+                f"收 {q.close:.2f}，{sign}{q.change_pct:.2f}%"
+            )
+
     src = brief.snapshot_today.source
     is_full = src == "cmoney"
     lines.extend([

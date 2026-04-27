@@ -104,6 +104,25 @@ class BenchmarkComparison(BaseModel):
     benchmark_top10_concentration: float  # 0050 前 10 大合計權重
 
 
+class USTickerQuote(BaseModel):
+    """美股單一指數或個股的昨夜表現（給講稿 market 段引用）。"""
+
+    symbol: str                # Yahoo symbol，例如 "^GSPC"、"NVDA"
+    display_name: str          # 中文/可朗讀名稱，例如 "費城半導體指數"
+    category: Literal["index", "stock"]
+    close: float
+    prev_close: float
+    change: float              # close - prev_close（價格單位）
+    change_pct: float          # 漲跌幅百分比
+
+
+class USMarketSnapshot(BaseModel):
+    """昨夜美股快照：包含主要指數與 00981A 相關 AI 供應鏈權值股。"""
+
+    session_date: date         # 美股最近一個收盤日（紐約時區）
+    quotes: list[USTickerQuote]
+
+
 class DailyBrief(BaseModel):
     date: date
     snapshot_today: HoldingsSnapshot
@@ -112,3 +131,4 @@ class DailyBrief(BaseModel):
     stock_briefs: list[StockBrief]
     quote: DailyQuote | None = None
     benchmark: BenchmarkComparison | None = None
+    us_market: USMarketSnapshot | None = None
