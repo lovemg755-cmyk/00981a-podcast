@@ -19,6 +19,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   publish:
@@ -27,6 +29,9 @@ jobs:
     concurrency:
       group: daily-podcast
       cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-pages.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -91,3 +96,18 @@ jobs:
             git commit -m "Episode $(date -u +%F): auto-publish"
             git push
           fi
+
+      - name: Setup Pages
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+      - name: Deploy to GitHub Pages
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        id: deploy-pages
+        uses: actions/deploy-pages@v4
