@@ -37,6 +37,22 @@ def _describe_lag(publish_date: date, trade_date: date) -> str:
     return f"{delta} 天前（較長間隔，可能連假後）"
 
 
+def _next_episode_phrase(publish_date: date) -> str:
+    """outro 結尾「我們 X 見」要用的稱呼。
+
+    cron 設計：週日(0)~週四(4) UTC 跑 = 台北週一~週五早上發布。
+      - 週一~週四發布 → 下集隔天 → 「明天」
+      - 週五發布 → 下集是下週一 → 「下週一」
+      - 週末發布（罕見，僅手動觸發）→ 保守用「下個交易日」
+    """
+    wd = publish_date.weekday()  # Mon=0..Sun=6
+    if wd <= 3:
+        return "明天"
+    if wd == 4:
+        return "下週一"
+    return "下個交易日"
+
+
 class ScriptSegment(BaseModel):
     segment: str
     text: str
@@ -63,11 +79,13 @@ def _format_brief_for_llm(brief: DailyBrief, publish_date: date) -> str:
     與 brief.date（分析交易日）必須在開場明確區分，避免聽眾時間錯亂。
     """
     relative = _describe_lag(publish_date, brief.date)
+    next_ep = _next_episode_phrase(publish_date)
     lines = [
         "## 時間資訊（開場必用，禁止混淆）",
         f"- 節目發布日（聽眾收聽當天，「今天」）：{_format_date_with_weekday(publish_date)}",
         f"- 分析交易日（資料對應日，「我們要看的那天」）：{_format_date_with_weekday(brief.date)}",
         f"- 兩日關係：交易日相對發布日是「{relative}」",
+        f"- outro 結尾招呼語：「我們{next_ep}見」（依 publish_date 星期幾自動算好的）",
         "",
         f"基金：00981A 統一台股增長主動式 ETF",
         f"當日持股檔數：{len(brief.snapshot_today.holdings)}",
