@@ -17,6 +17,9 @@ import sys
 import traceback
 from datetime import date, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+TAIPEI = ZoneInfo("Asia/Taipei")
 
 from .audio.compose import compose_episode, get_duration_seconds
 from .audio.tts import synthesize
@@ -126,7 +129,9 @@ async def run_pipeline(*, target_date: date | None = None, dry_run: bool = False
     )
 
     # 4. 講稿
-    script = await generate_script(brief, settings=settings)
+    publish_date = datetime.now(TAIPEI).date()
+    logger.info(f"節目發布日（台北時區）：{publish_date}；分析交易日：{target_date}")
+    script = await generate_script(brief, publish_date=publish_date, settings=settings)
     save_script(script, episode_dir)
 
     # 5. TTS + 後製

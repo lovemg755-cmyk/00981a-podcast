@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 
 from anthropic import AsyncAnthropic
@@ -12,6 +13,28 @@ from ..utils.config import Settings
 from ..utils.logger import logger
 
 PROMPT_PATH = Path(__file__).parent / "prompt_template.md"
+
+WEEKDAY_TW = ["一", "二", "三", "四", "五", "六", "日"]
+
+
+def _format_date_with_weekday(d: date) -> str:
+    return f"{d.isoformat()}（星期{WEEKDAY_TW[d.weekday()]}）"
+
+
+def _describe_lag(publish_date: date, trade_date: date) -> str:
+    """用相對描述提示 LLM 兩個日期的關係（昨天 / 上週五 / 連假前等）。"""
+    delta = (publish_date - trade_date).days
+    if delta <= 0:
+        return "同一日"
+    if delta == 1:
+        return "昨天"
+    if delta == 2 and publish_date.weekday() == 0 and trade_date.weekday() == 5:
+        return "上週六（罕見：交易日為週六）"
+    if delta == 3 and publish_date.weekday() == 0 and trade_date.weekday() == 4:
+        return "上週五"
+    if delta <= 4:
+        return f"{delta} 天前（可能跨週末或連假）"
+    return f"{delta} 天前（較長間隔，可能連假後）"
 
 
 class ScriptSegment(BaseModel):
@@ -33,10 +56,19 @@ class PodcastScript(BaseModel):
         return len(self.full_text)
 
 
-def _format_brief_for_llm(brief: DailyBrief) -> str:
-    """把 DailyBrief 轉成給 LLM 的緊湊文字描述。"""
+def _format_brief_for_llm(brief: DailyBrief, publish_date: date) -> str:
+    """把 DailyBrief 轉成給 LLM 的緊湊文字描述。
+
+    publish_date 是節目實際播出日（聽眾收聽當天，台北時區），
+    與 brief.date（分析交易日）必須在開場明確區分，避免聽眾時間錯亂。
+    """
+    relative = _describe_lag(publish_date, brief.date)
     lines = [
-        f"分析交易日：{brief.date.isoformat()}（節目發布為其後第一個工作日早上 7:00）",
+        "## 時間資訊（開場必用，禁止混淆）",
+        f"- 節目發布日（聽眾收聽當天，「今天」）：{_format_date_with_weekday(publish_date)}",
+        f"- 分析交易日（資料對應日，「我們要看的那天」）：{_format_date_with_weekday(brief.date)}",
+        f"- 兩日關係：交易日相對發布日是「{relative}」",
+        "",
         f"基金：00981A 統一台股增長主動式 ETF",
         f"當日持股檔數：{len(brief.snapshot_today.holdings)}",
     ]
@@ -128,13 +160,14 @@ def _format_brief_for_llm(brief: DailyBrief) -> str:
 async def generate_script(
     brief: DailyBrief,
     *,
+    publish_date: date,
     settings: Settings | None = None,
 ) -> PodcastScript:
     settings = settings or Settings.load()
     system_prompt = PROMPT_PATH.read_text(encoding="utf-8")
     user_prompt = (
         "以下是今日素材，請依系統提示中的節目結構生成講稿並輸出 JSON：\n\n"
-        + _format_brief_for_llm(brief)
+        + _format_brief_for_llm(brief, publish_date)
     )
 
     client = AsyncAnthropic(api_key=settings.anthropic_api_key)
