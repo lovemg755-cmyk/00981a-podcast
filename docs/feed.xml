@@ -13,7 +13,7 @@
       <link>https://lovemg755-cmyk.github.io/00981a-podcast/feed.xml</link>
     </image>
     <language>zh-TW</language>
-    <lastBuildDate>Mon, 27 Apr 2026 23:56:22 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 28 Apr 2026 23:57:18 +0000</lastBuildDate>
     <itunes:author>AI 主播小愛</itunes:author>
     <itunes:category text="Business">
       <itunes:category text="Investing"/>
@@ -26,6 +26,17 @@
     </itunes:owner>
     <itunes:summary>AI 主播小愛每個交易日帶你追蹤 00981A 統一台股增長主動式 ETF 的持股、收盤、與催化劑。5–10 分鐘掌握主動 ETF 經理人在做什麼，盤後輕鬆吸收最新動態。</itunes:summary>
     <itunes:type>episodic</itunes:type>
+    <item>
+      <title>4/28 00981A：小跌零點三趴，費半大跌三趴半考驗瑤姊</title>
+      <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-28.mp3</link>
+      <description>昨日 00981A 小跌 0.32%，但費城半導體重挫近三點六趴，台積電 ADR 也跌了三趴多。瑤姊手上南電、貿聯-KY、金像電、健策這幾張 alpha 牌能不能撐住，今天開盤就是關鍵。</description>
+      <guid isPermaLink="false">https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-28.mp3</guid>
+      <enclosure url="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-28.mp3" length="8774401" type="audio/mpeg"/>
+      <pubDate>Tue, 28 Apr 2026 18:00:00 +0800</pubDate>
+      <itunes:image href="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/cover.png"/>
+      <itunes:duration>00:08:44</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
     <item>
       <title>4/27 00981A：費半走軟但瑤姊微調不手軟，緯穎加碼背後的邏輯</title>
       <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-27.mp3</link>
