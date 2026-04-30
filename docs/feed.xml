@@ -13,7 +13,7 @@
       <link>https://lovemg755-cmyk.github.io/00981a-podcast/feed.xml</link>
     </image>
     <language>zh-TW</language>
-    <lastBuildDate>Wed, 29 Apr 2026 23:56:39 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 30 Apr 2026 23:55:25 +0000</lastBuildDate>
     <itunes:author>AI 主播小愛</itunes:author>
     <itunes:category text="Business">
       <itunes:category text="Investing"/>
@@ -26,6 +26,17 @@
     </itunes:owner>
     <itunes:summary>AI 主播小愛每個交易日帶你追蹤 00981A 統一台股增長主動式 ETF 的持股、收盤、與催化劑。5–10 分鐘掌握主動 ETF 經理人在做什麼，盤後輕鬆吸收最新動態。</itunes:summary>
     <itunes:type>episodic</itunes:type>
+    <item>
+      <title>04/30 00981A：ABF 載板加碼、欣興南電齊發力，漲近兩趴</title>
+      <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-30.mp3</link>
+      <description>昨天 00981A 收漲近兩趴，瑤姊加碼欣興、南電兩大 ABF 載板標的，新建倉萬潤，同步出清鴻勁與南亞。載板漲價循環正在推升 alpha，這集拆解背後的配置邏輯。</description>
+      <guid isPermaLink="false">https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-30.mp3</guid>
+      <enclosure url="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-30.mp3" length="9365573" type="audio/mpeg"/>
+      <pubDate>Thu, 30 Apr 2026 18:00:00 +0800</pubDate>
+      <itunes:image href="https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/cover.png"/>
+      <itunes:duration>00:09:21</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
     <item>
       <title>4/29 00981A：費半大漲兩趴，瑤姊配置紋絲不動</title>
       <link>https://pub-f26989f7cfeb402aa0d2e9a352e17c60.r2.dev/episodes/2026/04/2026-04-29.mp3</link>
